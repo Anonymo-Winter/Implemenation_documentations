@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Backlinks & Conflict Resolution Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            background: #2d3748;
+            color: white;
+            padding: 1rem 2rem;
+            z-index: 100;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            margin: 0 0.25rem;
+            display: inline-block;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        nav a:hover {
+            background: #4a5568;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        section {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        section:last-child {
+            border-bottom: none;
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+
+        h3 {
+            color: #4a5568;
+            font-size: 1.5rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        h4 {
+            color: #2d3748;
+            font-size: 1.2rem;
+            margin: 1rem 0 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+
+        code {
+            background: #f7fafc;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #e53e3e;
+        }
+
+        pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            line-height: 1.5;
+        }
+
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+
+        .badge-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .badge-danger {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .badge-warning {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+
+        .badge-info {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: #ebf8ff;
+            border-color: #3182ce;
+            color: #2c5282;
+        }
+
+        .alert-warning {
+            background: #fffaf0;
+            border-color: #dd6b20;
+            color: #7c2d12;
+        }
+
+        .alert-danger {
+            background: #fff5f5;
+            border-color: #e53e3e;
+            color: #742a2a;
+        }
+
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .function-ref {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .function-ref h4 {
+            margin-top: 0;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #667eea;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .back-to-top:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.75rem;
+            }
+
+            .content {
+                padding: 1rem;
+            }
+
+            nav {
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dynamic Backlinks & Conflict Resolution</h1>
+            <p>Comprehensive Technical Documentation</p>
+        </header>
+
+        <nav>
+            <a href="#overview">Overview</a>
+            <a href="#pipeline">Pipeline</a>
+            <a href="#conflict">Conflict Resolution</a>
+            <a href="#edge-cases">Edge Cases</a>
+            <a href="#functions">Function Reference</a>
+            <a href="#examples">Examples</a>
+        </nav>
+
+        <div class="content">
+            <section id="overview">
+                <h2>Overview</h2>
+                <div class="alert alert-info">
+                    <strong>Goal:</strong> When a user clicks a cell in a pivot/table result, generate a backlink to the underlying "detail view" that reproduces the same slice of data.
+                </div>
+
+                <h3>Key Components</h3>
+                <ul>
+                    <li>Uses dataset config (object_id, view_id/rf_id, default filters)</li>
+                    <li>Adds filters derived from clicked row context (row group values, pivot values)</li>
+                    <li>Adds special filters for metric membership (dataset "filter" rowGroup with filter_value)</li>
+                    <li>Merges frontend filters (effective filters tree) when available</li>
+                    <li>Resolves conflicts between base/default filters and context filters</li>
+                </ul>
+
+                <h3>Two Backlink Builders</h3>
+                <div class="function-ref">
+                    <h4>1. build_dynamic_backlink_for_cell (older approach)</h4>
+                    <p>Legacy implementation without conflict resolution</p>
+                </div>
+
+                <div class="function-ref">
+                    <h4>2. build_effective_backlink_for_cell (newer approach)</h4>
+                    <p>Modern implementation with full conflict resolution engine</p>
+                </div>
+
+                <p>The <code>prepare_backlink_for_cell</code> function uses effective backlinks when:</p>
+                <pre><code>if self.is_preview and field_info.get("format_options", {}).get("dynamic", False):
+    eff_link = self.build_effective_backlink_for_cell(...)</code></pre>
+            </section>
+
+            <section id="pipeline">
+                <h2>High-Level Pipeline</h2>
+
+                <h3>Entry Point: prepare_backlink_for_cell</h3>
+                <p><strong>Purpose:</strong> Decide which backlink strategy to use</p>
+                
+                <h4>Behavior:</h4>
+                <ul>
+                    <li>If computed field → return <code>{}</code> (no link)</li>
+                    <li>If preview & dynamic → call <code>build_effective_backlink_for_cell</code></li>
+                    <li>Else if explicit format_options.backlink template exists → build static backlink</li>
+                </ul>
+
+                <h3>Effective Dynamic Backlink Builder</h3>
+                <p><strong>Function:</strong> <code>build_effective_backlink_for_cell(field_name, field_info, row_values_for_link)</code></p>
+
+                <h4>Builds the backlink payload:</h4>
+                <pre><code>{
+  "base_url": "...",
+  "filters": {
+    "logic": "and",
+    "filters": [ ...final merged filter nodes... ]
+  }
+}</code></pre>
+
+                <h3>Step-by-Step Process</h3>
+
+                <h4>0) Guards</h4>
+                <pre><code>if field_info.get("computed"): return {}</code></pre>
+                <p>Computed cells don't map cleanly to underlying records.</p>
+
+                <h4>1) Determine config_id, dataset_cfg, object_id</h4>
+                <p>Uses <code>_resolve_config_id_for_field()</code> then looks up in <code>configs_dataset_json</code></p>
+
+                <h4>2) Build base_url</h4>
+                <pre><code>base_url = f"https://act.dexur.com/cl/{client}/nt/{network}/ro/cb/ob/{object_id}"
++ view/rf_id query param</code></pre>
+
+                <h4>3) Get "base filter tree"</h4>
+                <pre><code>base_tree = effective_filters_by_config[field_config_id]
+         OR dataset_cfg.filters.default</code></pre>
+                <p>If missing/invalid → normalize to: <code>{ "logic": "and", "filters": [] }</code></p>
+
+                <h4>4) Normalize row_values (date dynamic coalescing)</h4>
+                <pre><code>row_values = self.process_dynamic_values_v3(row_values)</code></pre>
+
+                <h4>5) Decide which row values to inject</h4>
+                <div class="alert alert-warning">
+                    <strong>Metric vs Non-metric click:</strong>
+                    <ul>
+                        <li><strong>Metric:</strong> allowed aliases = metric ancestors + metric alias itself</li>
+                        <li><strong>Non-metric:</strong> allowed aliases = pivot fields + row fields + dataset aliases in row_values + clicked alias + ancestors</li>
+                    </ul>
+                </div>
+
+                <h4>6) Build "context_tuples" from allowed row_values</h4>
+                <p>Transform raw row_values into filter tuples like:</p>
+                <ul>
+                    <li><code>(field_id, "eq", value)</code></li>
+                    <li><code>(field_id, "in", [v1,v2])</code></li>
+                    <li><code>(field_id, "glte", [(start,end)])</code></li>
+                    <li><code>(field_id, "range", (from,to))</code></li>
+                    <li><code>(field_id, "contains", value)</code> (metric membership)</li>
+                </ul>
+
+                <h4>7) Metric membership enforcement</h4>
+                <p>If clicked field is metric membership, add:</p>
+                <pre><code>{ "field": metric_field_id, "operator": "contains", "value": filter_value }</code></pre>
+
+                <h4>8) Merge with conflict resolution</h4>
+                <p><strong>Order policy:</strong></p>
+                <ol>
+                    <li>Apply metric constraints first to base tree</li>
+                    <li>Apply context constraints second to base tree</li>
+                    <li>Append remaining context nodes (not consumed)</li>
+                    <li>Append remaining metric nodes (not consumed)</li>
+                </ol>
+            </section>
+
+            <section id="conflict">
+                <h2>Conflict Resolution System</h2>
+
+                <div class="alert alert-info">
+                    <strong>Goal:</strong> Not to "pick a winner" blindly, but to tighten base filters when possible, avoid generating impossible filters, and avoid duplicating constraints.
+                </div>
+
+                <h3>System is Conservative</h3>
+                <p>If it can't prove compatibility or intersection, it keeps base and does not consume context (context may get appended, causing visible redundancy).</p>
+
+                <h3>Normalization Helpers</h3>
+
+                <div class="function-ref">
+                    <h4>_norm_match(v)</h4>
+                    <p>If string: <code>strip().casefold()</code>, else unchanged. Used for case-insensitive comparisons.</p>
+                </div>
+
+                <div class="function-ref">
+                    <h4>_unique_by_norm(vals)</h4>
+                    <p>Dedup values by <code>_norm_match</code>, but returns original values (preserving "first-seen formatting").</p>
+                </div>
+
+                <div class="alert alert-warning">
+                    <strong>Note:</strong> This only dedupes; it does not "fix casing". You can end up with row showing "ANTHEM INSURANCE..." but filter using "anthem insurance..."
+                </div>
+
+                <h3>Comparable Value Helpers</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>_cmp_kind(v)</code></td>
+                            <td>Coerce value to: date (YYYY-MM-DD), num, or str</td>
+                        </tr>
+                        <tr>
+                            <td><code>_cmp_vals(a,b)</code></td>
+                            <td>Compare as date/num if possible, else as casefold string</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Interval Model</h3>
+
+                <div class="function-ref">
+                    <h4>_interval(lo, hi, lo_incl, hi_incl)</h4>
+                    <p>Represents a window where lo/hi can be None for open ended, with inclusivity flags.</p>
+                </div>
+
+                <div class="function-ref">
+                    <h4>_intersect_interval(a,b)</h4>
+                    <p>Returns intersection interval or None if empty.</p>
+                </div>
+
+                <div class="function-ref">
+                    <h4>_intersect_interval_sets(A,B)</h4>
+                    <p>OR-set intersection where result is all pairwise intersections.</p>
+                </div>
+
+                <h3>Building Constraints Map</h3>
+
+                <p><strong>Input:</strong> List of tuples like:</p>
+                <pre><code>[
+  ("Of_X","eq","A"),
+  ("Of_X","neq","B"),
+  ("Of_Y","glte",[("2025-01-01","2025-12-31")]),
+  ("Of_Y","gte","2025-06-01"),
+  ("Of_Z","not_in",["x","y"]),
+]</code></pre>
+
+                <p><strong>Output:</strong> Per-field summary:</p>
+                <pre><code>{
+  "Of_X": { eq:[...], in:[...], contains:[...], neq:[...], not_in:[...], windows:[...] },
+  "Of_Y": { ..., windows:[intersected intervals] },
+  ...
+}</code></pre>
+
+                <h3>Supported Operators</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Operator</th>
+                            <th>Meaning</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>eq</code></td>
+                            <td>Scalar equality</td>
+                        </tr>
+                        <tr>
+                            <td><code>in</code></td>
+                            <td>List membership</td>
+                        </tr>
+                        <tr>
+                            <td><code>contains</code></td>
+                            <td>Text membership (metric membership)</td>
+                        </tr>
+                        <tr>
+                            <td><code>neq</code></td>
+                            <td>Not equal (kept alongside eq/in)</td>
+                        </tr>
+                        <tr>
+                            <td><code>not_in</code></td>
+                            <td>Exclude list</td>
+                        </tr>
+                        <tr>
+                            <td><code>glte</code></td>
+                            <td>List of (start,end) inclusive windows, OR semantics</td>
+                        </tr>
+                        <tr>
+                            <td><code>range</code></td>
+                            <td>(from,to) half-open [from, to)</td>
+                        </tr>
+                        <tr>
+                            <td><code>gt/gte/lt/lte</code></td>
+                            <td>Atomic bounds; translated to windows and intersected</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Policy Statement</h3>
+                <div class="alert alert-info">
+                    "It can have not_in, neq, lte, lt, gt, gte along with eq… if there is a neq and eq/in keep them both."
+                </div>
+            </section>
+
+            <section id="edge-cases">
+                <h2>Edge Cases</h2>
+
+                <h3>Supported Cases</h3>
+                <div class="badge badge-success">✓ Windows intersection</div>
+                <div class="badge badge-success">✓ Keeping neq with eq/in</div>
+                <div class="badge badge-success">✓ not_in unioning</div>
+                <div class="badge badge-success">✓ Metric membership enforcement</div>
+
+                <h4>Windows Intersection Examples:</h4>
+                <ul>
+                    <li>base has gte + lte AND context has gte + lte → intersection window</li>
+                    <li>base has gte + lt AND context has gte + lte → intersection window</li>
+                    <li>base has range (from,to) AND context has gte/lt → intersection</li>
+                    <li>base window is atomic gte or lt and context has multi-windows glte → intersection</li>
+                </ul>
+
+                <h3>Known Gaps (Messy Filters)</h3>
+                <div class="badge badge-danger">✗ eq/in dominating not_in</div>
+                <div class="badge badge-danger">✗ Base tree OR logic with mixed fields</div>
+                <div class="badge badge-danger">✗ Type coercion mismatches</div>
+
+                <h4>Gap 1: eq/in dominating not_in</h4>
+                <div class="alert alert-warning">
+                    <strong>Expected (not implemented):</strong> If you already have <code>eq A</code>, <code>not_in</code> for the same field is redundant unless it excludes A.
+                    <br><strong>Current:</strong> Both remain.
+                </div>
+
+                <h4>Gap 2: Base tree OR logic</h4>
+                <p>Tree traversal handles nested groups, but only resolves windows safely when it can parse them as same-field bounds. Complex ORs won't be fully consumed.</p>
+
+                <h4>Gap 3: Type coercion mismatches</h4>
+                <pre><code>base: 10.56 (float)
+context: "10.56" (string)</code></pre>
+                <p>Depending on backend coercion, this can cause silent misses.</p>
+
+                <h3>Real Example: Redundant Filters</h3>
+
+                <h4>Case 1: not_in + eq both present</h4>
+                <pre><code>base has Of_1000385078 not_in [big list]
+context adds Of_1000385078 eq "Acute MI 30-Day Mortality Rate"</code></pre>
+                <p>Not necessarily contradictory (unless eq value is inside not_in), so system keeps both.</p>
+
+                <h4>Case 2: Case mismatch</h4>
+                <pre><code>Row shows: "ANTHEM INSURANCE COMPANIES, INC."
+Filter shows: "anthem insurance companies, inc."</code></pre>
+                <p>This happens because row_value came in lowercased (ES aggregation normalization), and <code>_unique_by_norm</code> preserves "first seen" form without fixing casing.</p>
+            </section>
+
+            <section id="examples">
+                <h2>Full Example: End-to-End</h2>
+
+                <h3>Dataset Default Filters (base_tree)</h3>
+                <pre><code>{
+  "logic":"and",
+  "filters":[
+    {"field":"Of_org","operator":"in","value":[990]},
+    {"field":"Of_measure","operator":"not_in","value":["X","Y","Z"]}
+  ]
+}</code></pre>
+
+                <h3>Click Context (row_values_for_link)</h3>
+                <pre><code>{
+  "Quality Measure": "Acute MI 30-Day Mortality Rate",
+  "National Data Value": 10.56
+}</code></pre>
+
+                <p>Assume rowGroup says:</p>
+                <ul>
+                    <li>"Quality Measure" is terms → maps to field <code>Of_measure</code></li>
+                    <li>"National Data Value" is terms → maps to field <code>Of_value</code></li>
+                </ul>
+
+                <h3>Context Tuples Built</h3>
+                <pre><code>[
+  ("Of_measure", "eq", "Acute MI 30-Day Mortality Rate"),
+  ("Of_value",   "eq", 10.56)
+]</code></pre>
+
+                <h3>Merge Result (today)</h3>
+                <p>Final filters will likely contain:</p>
+                <ul>
+                    <li><code>Of_measure not_in [X,Y,Z]</code></li>
+                    <li><code>Of_measure eq Acute MI...</code></li>
+                    <li><code>Of_value eq 10.56</code></li>
+                    <li><code>Of_org in [990]</code></li>
+                </ul>
+
+                <div class="alert alert-warning">
+                    This is valid if "Acute MI" not in [X,Y,Z]. It is redundant but not simplified.
+                </div>
+            </section>
+
+            <section id="functions">
+                <h2>Function-by-Function Reference</h2>
+
+                <h3>Backlink Strategy Selection</h3>
+                <div class="function-ref">
+                    <h4>prepare_backlink_for_cell</h4>
+                    <p>Chooses effective dynamic vs static template</p>
+                </div>
+
+                <h3>Dataset Metadata Helpers</h3>
+                <div class="function-ref">
+                    <h4>_resolve_config_id_for_field</h4>
+                    <p>Decide which config_id a field belongs to</p>
+                </div>
+
+                <div class="function-ref">
+                    <h4>_effective_rowgroup_field_id</h4>
+                    <p>Choose the best field_path, normalize fr prefix case</p>
+                </div>
+
+                <div class="function-ref">
+                    <h4>_normalize_fr_field_path</h4>
+                    <p>Fix fr_XXXX__fr_YYYY__... to fr_XXXX_fr_YYYY__... (first join only)</p>
+                </div>
+
+                <div class="function-ref">
+                    <h4>_get_dataset_field_path</h4>
+                    <p>Alias → field_path lookup</p>
+                </div>
+
+                <div class="function-ref">
+                    <h4>_resolve_dataset_field_id</h4>
+                    <p>Ensure we use dataset field_path consistently</p>
+                </div>
+
+                <h3>Metric Membership Helpers</h3>
+                <div class="function-ref">
+                    <h4>_is_metric_membership_field</h4>
+                    <p>Checks if alias is groupby_type "filter"</p>
+                </div>
+
+                <div class="function-ref">
+                    <h4>_get_metric_filter_value</h4>
+                    <p>Returns (field_path, filter_value)</p>
+                </div>
+
+                <div class="function-ref">
+                    <h4>_get_metric_ancestors</h4>
+                    <p>Returns metric dimension hierarchy ancestors</p>
+                </div>
+
+                <h3>Date/Range Resolution Helpers</h3>
+                <div class="function-ref">
+                    <h4>_resolve_date_range_value</h4>
+                    <p>"Past 30 days" key → actual start/end</p>
+                </div>
+
+                <div class="function-ref">
+                    <h4>get_range</h4>
+                    <p>Translates range bucket keys into numeric/date bounds</p>
+                </div>
+
+                <div class="function-ref">
+                    <h4>process_dynamic_values_v3</h4>
+                    <p>Combine year/month fields into $ date range strings</p>
+                </div>
+
+                <h3>Conflict Resolution Engine</h3>
+                <div class="function-ref">
+                    <h4>_build_constraints_map</h4>
+                    <p>Compress tuples into per-field constraints + intersect windows</p>
+                </div>
+
+                <div class="function-ref">
+                    <h4>_resolve_tree_with_constraints</h4>
+                    <p>Traverse base tree and tighten where possible</p>
+                </div>
+
+                <div class="function-ref">
+                    <h4>_resolve_atomic_with_constraints</h4>
+                    <p>Resolve eq/in/contains/not_in/neq base nodes with ctx constraints</p>
+                </div>
+
+                <div class="function-ref">
+                    <h4>_node_fields</h4>
+                    <p>Figure out which fields appear in a node (for dedupe/consumption)</p>
+                </div>
+
+                <h3>Interval Helpers</h3>
+                <ul>
+                    <li><code>_interval</code>: Create interval representation</li>
+                    <li><code>_intersect_interval</code>: Intersect two intervals</li>
+                    <li><code>_intersect_interval_sets</code>: OR-set intersection</li>
+                    <li><code>_intervals_to_filter_node</code>: Convert intervals back to filter tree</li>
+                </ul>
+
+                <h3>Comparison Helpers</h3>
+                <ul>
+                    <li><code>_cmp_kind</code>: Determine value type for comparison</li>
+                    <li><code>_cmp_vals</code>: Compare dates/numbers safely</li>
+                    <li><code>_unique_by_norm</code>: Case-insensitive dedupe</li>
+                    <li><code>_norm_match</code>: Normalize for comparison</li>
+                </ul>
+            </section>
+
+            <section id="recommendations">
+                <h2>Recommendations for Future</h2>
+
+                <h3>1. not_in vs eq/in Simplification</h3>
+                <div class="alert alert-info">
+                    <strong>When base node is not_in and ctx has eq:</strong>
+                    <ul>
+                        <li>If eq is excluded → conflict; choose one policy (prefer ctx or base)</li>
+                        <li>Else drop not_in (redundant)</li>
+                    </ul>
+                    <strong>When base node is not_in and ctx has in:</strong>
+                    <ul>
+                        <li>Remove excluded values from in</li>
+                        <li>If in becomes empty → conflict</li>
+                    </ul>
+                </div>
+
+                <h3>2. Canonicalization of Displayed Text Values</h3>
+                <p>If you want the filter "value" to preserve original casing:</p>
+                <ul>
+                    <li>Store original display values from raw_data row context, not normalized bucket keys</li>
+                    <li>Or add a "displayValue" separate from "filterValue"</li>
+                </ul>
+
+                <h3>3. Additional Documentation</h3>
+                <p>Add explicit rules in code comments for:</p>
+                <ul>
+                    <li>When to consume vs append context filters</li>
+                    <li>Priority order reasoning (metric > context > base)</li>
+                    <li>Examples of each conflict resolution case</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <a href="#" class="back-to-top">↑</a>
+
+    <script>
+        document.querySelector('.back-to-top').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Highlight current section in navigation
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('nav a');
+
+        window
