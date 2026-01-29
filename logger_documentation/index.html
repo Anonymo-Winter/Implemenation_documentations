@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Logger System Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        header {
+            text-align: center;
+            padding-bottom: 40px;
+            border-bottom: 3px solid #2E5C8A;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #2E5C8A;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #666;
+            font-style: italic;
+        }
+
+        h2 {
+            font-size: 2em;
+            color: #2E5C8A;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            color: #2E5C8A;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            font-size: 1.2em;
+            color: #2E5C8A;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-radius: 5px;
+            margin-bottom: 40px;
+        }
+
+        .toc h3 {
+            margin-top: 0;
+            color: #2E5C8A;
+        }
+
+        .toc ol {
+            margin-left: 20px;
+        }
+
+        .toc li {
+            margin: 8px 0;
+        }
+
+        .toc a {
+            color: #2E5C8A;
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            color: #c7254e;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-left: 4px solid #2E5C8A;
+        }
+
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .keyword {
+            color: #ff79c6;
+        }
+
+        .string {
+            color: #50fa7b;
+        }
+
+        .comment {
+            color: #6272a4;
+            font-style: italic;
+        }
+
+        .function {
+            color: #8be9fd;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: #2E5C8A;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        tr:hover {
+            background: #f0f0f0;
+        }
+
+        .note {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 3px;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 3px;
+        }
+
+        .error {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 3px;
+        }
+
+        .success {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 3px;
+        }
+
+        .box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        strong {
+            color: #2E5C8A;
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .badge-error {
+            background: #f44336;
+            color: white;
+        }
+
+        .badge-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .badge-info {
+            background: #2196F3;
+            color: white;
+        }
+
+        .badge-success {
+            background: #4caf50;
+            color: white;
+        }
+
+        footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            pre {
+                page-break-inside: avoid;
+            }
+        }
+
+        .command {
+            background: #2d2d2d;
+            color: #50fa7b;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            margin: 10px 0;
+            display: block;
+            overflow-x: auto;
+        }
+
+        .shell-prompt {
+            color: #ff79c6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Custom Logger System Documentation</h1>
+            <p class="subtitle">Comprehensive Guide to Structured Logging with Request Isolation</p>
+        </header>
+
+        <div class="toc">
+            <h3>📋 Table of Contents</h3>
+            <ol>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#implementation">Logger Implementation</a></li>
+                <li><a href="#logger-key">Logger Key Pattern</a></li>
+                <li><a href="#best-practices">Logging Best Practices</a></li>
+                <li><a href="#log-extraction">Log Extraction with AWK</a></li>
+                <li><a href="#examples">Real-World Examples</a></li>
+                <li><a href="#troubleshooting">Troubleshooting Guide</a></li>
+            </ol>
+        </div>
+
+        <section id="overview">
+            <h2>1. Overview</h2>
+            <p>
+                This logger system provides a structured approach to logging with request-level isolation, 
+                automatic log rotation, and powerful extraction capabilities. It is designed for production 
+                environments where tracing individual requests through complex workflows is essential.
+            </p>
+
+            <h3>✨ Key Features</h3>
+            <ul>
+                <li><strong>Request-level isolation</strong> using unique logger keys</li>
+                <li><strong>Automatic daily log rotation</strong> with 7-day retention</li>
+                <li><strong>Structured logging</strong> with semantic markers (start, done, error, warning, custom sections)</li>
+                <li><strong>Color-coded log extraction</strong> for easy debugging</li>
+                <li><strong>Per-module log files</strong> for clean separation of concerns</li>
+            </ul>
+        </section>
+
+        <section id="implementation">
+            <h2>2. Logger Implementation</h2>
+
+            <h3>2.1 Logger Setup Code</h3>
+            <p>Create a reusable logger module (e.g., <code>custom_logger.py</code>):</p>
+
+            <pre><code><span class="keyword">import</span> logging
+<span class="keyword">import</span> os
+<span class="keyword">from</span> logging.handlers <span class="keyword">import</span> TimedRotatingFileHandler
+
+<span class="comment"># Path for custom logger</span>
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.abspath(os.path.join(CURRENT_DIR, <span class="string">'../../../'</span>))
+LOG_DIR = os.path.join(BASE_DIR, <span class="string">'logs/custom'</span>)
+
+<span class="keyword">def</span> <span class="function">get_logger</span>(name, level=logging.DEBUG):
+    <span class="string">"""
+    Dynamically create and return a logger instance
+    that logs to a separate rotating file per logger name.
+    
+    Args:
+        name (str): Logger name (typically module name)
+        level (int): Logging level (default: DEBUG)
+    
+    Returns:
+        logging.Logger: Configured logger instance
+    """</span>
+    logger = logging.getLogger(name)
+
+    <span class="keyword">if not</span> logger.handlers:
+        <span class="comment"># Create log directory if it doesn't exist</span>
+        os.makedirs(LOG_DIR, exist_ok=<span class="keyword">True</span>)
+
+        <span class="comment"># Define log file path dynamically</span>
+        log_file_path = os.path.join(LOG_DIR, <span class="string">f"{name}.log"</span>)
+
+        <span class="comment"># Set up handler with timed rotation</span>
+        handler = TimedRotatingFileHandler(
+            filename=log_file_path,
+            when=<span class="string">'midnight'</span>,
+            interval=<span class="number">1</span>,
+            backupCount=<span class="number">7</span>,  <span class="comment"># Keep 7 days' logs</span>
+            encoding=<span class="string">'utf-8'</span>
+        )
+
+        <span class="comment"># Formatting style</span>
+        formatter = logging.Formatter(
+            <span class="string">'[%(asctime)s] %(levelname)s [%(name)s %(pathname)s:%(lineno)s - %(funcName)s()] %(message)s'</span>,
+            datefmt=<span class="string">'%Y-%m-%d %H:%M:%S'</span>
+        )
+
+        handler.setFormatter(formatter)
+        handler.setLevel(level)
+
+        <span class="comment"># Attach handler and set log level</span>
+        logger.addHandler(handler)
+        logger.setLevel(level)
+
+        <span class="comment"># Prevent propagation to avoid duplication</span>
+        logger.propagate = <span class="keyword">False</span>
+
+    <span class="keyword">return</span> logger</code></pre>
+
+            <h3>2.2 Using the Logger in Your Code</h3>
+            <p>Import and initialize the logger at the top of your module:</p>
+
+            <pre><code><span class="keyword">from</span> utils.custom_logger <span class="keyword">import</span> get_logger
+
+<span class="comment"># Create module-specific logger</span>
+multi_object_reporting_logger = get_logger(<span class="string">'multi_object_reporting_view'</span>)</code></pre>
+
+            <div class="success">
+                <strong>✅ Best Practice:</strong> Always use descriptive names for your loggers that match 
+                your module names. This makes it easy to find the corresponding log file.
+            </div>
+        </section>
+
+        <section id="logger-key">
+            <h2>3. Logger Key Pattern</h2>
+
+            <h3>3.1 Generating Unique Logger Keys</h3>
+            <p>Each request gets a unique logger key based on the request object's memory ID. This enables 
+            complete isolation and traceability:</p>
+
+            <pre><code><span class="keyword">def</span> <span class="function">post</span>(self, request, client_id, network_id, dataset_id, visualization_id):
+    <span class="comment"># Generate unique key for this request</span>
+    logger_key = <span class="string">f"log-f{id(request)}"</span>
+    
+    <span class="comment"># Log request start</span>
+    multi_object_reporting_logger.info(<span class="string">f"[{logger_key}_start]"</span>)</code></pre>
+
+            <h4>Key Components</h4>
+            <div class="box">
+                <p><strong>Prefix:</strong> <code>log-f</code> (identifies this as a log-formatted key)</p>
+                <p><strong>Unique ID:</strong> Python's <code>id(request)</code> generates a unique integer for each request object</p>
+                <p><strong>Example:</strong> <code>log-f138462418256848</code></p>
+            </div>
+
+            <h3>3.2 Logger Key Markers</h3>
+            <p>Use semantic markers to structure your logs:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Marker Pattern</th>
+                        <th>Purpose</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>[{key}_start]</code></td>
+                        <td>Marks the beginning of request processing</td>
+                        <td><code>[log-f123_start]</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>[{key}_done]</code></td>
+                        <td>Marks successful completion of request</td>
+                        <td><code>[log-f123_done]</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>[{key}-ERROR]</code></td>
+                        <td>Indicates a critical error occurred</td>
+                        <td><code>[log-f123-ERROR]: ❌ Failed</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>[{key}-WARNING]</code></td>
+                        <td>Indicates a non-critical warning</td>
+                        <td><code>[log-f123-WARNING]: ⚠️ Issue</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>[{key}:section]</code></td>
+                        <td>Marks a custom processing section</td>
+                        <td><code>[log-f123:dataset_config]</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="best-practices">
+            <h2>4. Logging Best Practices</h2>
+
+            <h3>4.1 Request Lifecycle Pattern</h3>
+            <p>Always follow this pattern for complete request tracing:</p>
+
+            <pre><code><span class="keyword">def</span> <span class="function">post</span>(self, request, client_id, network_id, dataset_id, visualization_id):
+    logger_key = <span class="string">f"log-f{id(request)}"</span>
+    multi_object_reporting_logger.info(<span class="string">f"[{logger_key}_start]"</span>)
+    
+    <span class="keyword">try</span>:
+        <span class="comment"># Your business logic here</span>
+        
+        <span class="comment"># Log important checkpoints</span>
+        multi_object_reporting_logger.info(
+            <span class="string">f"[{logger_key}:dataset_config] data_set_input_json={self.data_set_input_json}"</span>
+        )
+        
+        <span class="comment"># Return response</span>
+        <span class="keyword">return</span> JsonResponse(final_resp, safe=<span class="keyword">False</span>)
+        
+    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:
+        multi_object_reporting_logger.exception(
+            <span class="string">f"[{logger_key}-ERROR]: ❌ Something went wrong: {e}"</span>
+        )
+        <span class="keyword">return</span> JsonResponse({<span class="string">"Error"</span>: str(e)}, status=<span class="number">400</span>)
+        
+    <span class="keyword">finally</span>:
+        multi_object_reporting_logger.info(<span class="string">f"[{logger_key}_done]"</span>)</code></pre>
+
+            <h3>4.2 Structured Request Information</h3>
+            <p>Log comprehensive request details at the start for debugging:</p>
+
+            <pre><code>multi_object_reporting_logger.info(<span class="string">"""
+    ╔════════════════════════════════════════════════════════════╗
+    ║ client_id = %s ║ network_id = %s ║ dataset_id = %s ║
+    ║ visualization_id = %s  ║ logger_key : %s ║
+    ╠════════════════════════════════════════════════════════════╣
+    ║ endpoint : %s
+    ║ mode     : %s
+    ║ user     : %s
+    ║ data     : %s
+    ║ kwargs   : %s
+    ║ time     : %s
+    ╚════════════════════════════════════════════════════════════╝
+    """</span>,
+    client_id, network_id, dataset_id, visualization_id,
+    logger_key, request.build_absolute_uri(), mode,
+    request.user, request.data, kwargs,
+    datetime.now().isoformat(sep=<span class="string">" "</span>, timespec=<span class="string">"seconds"</span>)
+)</code></pre>
+
+            <h3>4.3 Custom Section Markers</h3>
+            <p>Use descriptive section markers for different processing stages:</p>
+
+            <pre><code><span class="comment"># Dataset configuration</span>
+multi_object_reporting_logger.info(
+    <span class="string">f"[{logger_key}:dataset_config] data_set_input_json_after_filters={self.data_set_input_json}"</span>
+)
+
+<span class="comment"># OpenSearch query</span>
+multi_object_reporting_logger.info(
+    <span class="string">f"[{logger_key}:opensearch_query] msearch_query={self.msearch_query}"</span>
+)
+
+<span class="comment"># OpenSearch response</span>
+multi_object_reporting_logger.info(
+    <span class="string">f"[{logger_key}:opensearch_response] response={response_data}"</span>
+)
+
+<span class="comment"># First level formatting</span>
+multi_object_reporting_logger.info(
+    <span class="string">f"[{logger_key}:first_level_formatting] normalized_data={formatted_data}"</span>
+)
+
+<span class="comment"># Second level formatting</span>
+multi_object_reporting_logger.info(
+    <span class="string">f"[{logger_key}:second_level_formatting] final_response={final_resp}"</span>
+)</code></pre>
+
+            <h3>4.4 Error and Warning Logging</h3>
+            <p>Use consistent patterns for errors and warnings:</p>
+
+            <pre><code><span class="comment"># Warnings (non-critical issues)</span>
+multi_object_reporting_logger.warning(
+    <span class="string">f"[{logger_key}-WARNING]: ⚠️ Failed to parse JSON filters: {e}"</span>
+)
+
+<span class="comment"># Errors (critical issues)</span>
+multi_object_reporting_logger.exception(
+    <span class="string">f"[{logger_key}-ERROR]: ❌ Error occurred in query building: {e}"</span>
+)
+
+<span class="comment"># Use exception() instead of error() to include stack traces</span>
+<span class="keyword">try</span>:
+    risky_operation()
+<span class="keyword">except</span> Exception <span class="keyword">as</span> e:
+    multi_object_reporting_logger.exception(
+        <span class="string">f"[{logger_key}-ERROR]: ❌ {e}"</span>
+    )</code></pre>
+
+            <div class="warning">
+                <strong>⚠️ Important:</strong> Always use <code>.exception()</code> instead of <code>.error()</code> 
+                when logging exceptions. This automatically includes the full stack trace, which is invaluable for debugging.
+            </div>
+
+            <h3>4.5 Performance Timing</h3>
+            <p>Track execution time for performance optimization:</p>
+
+            <pre><code><span class="keyword">import</span> time
+
+<span class="comment"># Start timing</span>
+start_time = time.time()
+
+<span class="comment"># ... perform operation ...</span>
+
+<span class="comment"># Log with duration</span>
+multi_object_reporting_logger.info(
+    <span class="string">f"[{logger_key}:custom_expression] Time took for processing: {time.time() - start_time:.3f} seconds"</span>
+)</code></pre>
+        </section>
+
+        <section id="log-extraction">
+            <h2>5. Log Extraction with AWK</h2>
+
+            <h3>5.1 AWK Script for Colored Output</h3>
+            <p>The AWK script extracts logs for a specific request and applies color highlighting for easy visual parsing:</p>
+
+            <pre><code>awk -v k=<span class="string">"log-f138462418256848"</span> <span class="string">'
+BEGIN{
+  bg_red="\033[97;41m";   # Red background for errors
+  bg_yel="\033[30;43m";   # Yellow background for warnings
+  bg_cya="\033[30;46m";   # Cyan background for markers
+  rst="\033[0m";          # Reset formatting
+}
+$0 ~ "\\[" k "_start\\]" {p=1}  # Start capturing
+p{
+  line=$0
+  # Highlight FULL tags
+  gsub("\\[" k "-ERROR\\]",   bg_red "&" rst, line)
+  gsub("\\[" k "-WARNING\\]", bg_yel "&" rst, line)
+  # Highlight key markers
+  gsub("\\[" k "_start\\]", bg_cya "&" rst, line)
+  gsub("\\[" k "_done\\]",  bg_cya "&" rst, line)
+  gsub("\\[" k ":",         bg_cya "&" rst, line)
+  print line
+}
+$0 ~ "\\[" k "_done\\]" {exit}  # Stop after _done
+'</span> ./multi_object_reporting_view.log</code></pre>
+
+            <h3>5.2 Usage Instructions</h3>
+
+            <h4>Step 1: Find the Logger Key</h4>
+            <p>Look for recent requests in your log file:</p>
+
+            <div class="command">
+<span class="shell-prompt">$</span> grep "log-f" ./logs/custom/multi_object_reporting_view.log | tail -50
+
+<span class="shell-prompt">$</span> grep "client_id = 123" ./logs/custom/multi_object_reporting_view.log
+            </div>
+
+            <h4>Step 2: Extract Logs for Specific Request</h4>
+            <p>Replace the logger key in the AWK command:</p>
+
+            <div class="command">
+<span class="shell-prompt">$</span> cd ~/Desktop/logs/custom
+
+<span class="shell-prompt">$</span> awk -v k="log-f138462418256848" '[AWK_SCRIPT]' ./multi_object_reporting_view.log
+            </div>
+
+            <h4>Step 3: Save or Pipe Output</h4>
+
+            <div class="command">
+<span class="shell-prompt"># Save to file</span>
+<span class="shell-prompt">$</span> awk -v k="log-f138462418256848" '[AWK_SCRIPT]' ./multi_object_reporting_view.log > request_debug.log
+
+<span class="shell-prompt"># Pipe to less for scrolling</span>
+<span class="shell-prompt">$</span> awk -v k="log-f138462418256848" '[AWK_SCRIPT]' ./multi_object_reporting_view.log | less -R
+
+<span class="shell-prompt"># Count lines in output</span>
+<span class="shell-prompt">$</span> awk -v k="log-f138462418256848" '[AWK_SCRIPT]' ./multi_object_reporting_view.log | wc -l
+            </div>
+
+            <h3>5.3 Creating a Reusable Script</h3>
+            <p>Create a shell script for easier usage (<code>extract_log.sh</code>):</p>
+
+            <pre><code><span class="comment">#!/bin/bash
+# File: extract_log.sh
+# Usage: ./extract_log.sh &lt;logger_key&gt; [log_file]</span>
+
+<span class="keyword">if</span> [ -z <span class="string">"$1"</span> ]; <span class="keyword">then</span>
+    echo <span class="string">"Usage: $0 &lt;logger_key&gt; [log_file]"</span>
+    echo <span class="string">"Example: $0 log-f138462418256848"</span>
+    exit 1
+<span class="keyword">fi</span>
+
+LOGGER_KEY=<span class="string">"$1"</span>
+LOG_FILE=<span class="string">"${2:-./logs/custom/multi_object_reporting_view.log}"</span>
+
+awk -v k=<span class="string">"$LOGGER_KEY"</span> <span class="string">'
+BEGIN{
+  bg_red="\033[97;41m"; bg_yel="\033[30;43m";
+  bg_cya="\033[30;46m"; rst="\033[0m";
+}
+$0 ~ "\\[" k "_start\\]" {p=1}
+p{
+  line=$0
+  gsub("\\[" k "-ERROR\\]",   bg_red "&" rst, line)
+  gsub("\\[" k "-WARNING\\]", bg_yel "&" rst, line)
+  gsub("\\[" k "_start\\]", bg_cya "&" rst, line)
+  gsub("\\[" k "_done\\]",  bg_cya "&" rst, line)
+  gsub("\\[" k ":",         bg_cya "&" rst, line)
+  print line
+}
+$0 ~ "\\[" k "_done\\]" {exit}
+'</span> <span class="string">"$LOG_FILE"</span></code></pre>
+
+            <p>Make it executable and use it:</p>
+
+            <div class="command">
+<span class="shell-prompt">$</span> chmod +x extract_log.sh
+<span class="shell-prompt">$</span> ./extract_log.sh log-f138462418256848
+<span class="shell-prompt">$</span> ./extract_log.sh log-f138462418256848 /path/to/custom/logfile.log
+            </div>
+        </section>
+
+        <section id="examples">
+            <h2>6. Real-World Examples</h2>
+
+            <h3>6.1 Complete API View Example</h3>
+            <p>Example from ReportBuilderAPIView showing full integration:</p>
+
+            <pre><code><span class="keyword">class</span> <span class="function">ReportBuilderAPIView</span>(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+    http_method_names = [<span class="string">'post'</span>]
+
+    <span class="keyword">def</span> <span class="function">post</span>(self, request, client_id, network_id, dataset_id, visualization_id):
+        <span class="comment"># Initialize logger key</span>
+        logger_key = <span class="string">f"log-f{id(request)}"</span>
+        multi_object_reporting_logger.info(<span class="string">f"[{logger_key}_start]"</span>)
+
+        <span class="keyword">try</span>:
+            <span class="comment"># Log request details</span>
+            multi_object_reporting_logger.info(<span class="string">"""
+                ╔═══════════════════════════════════════════╗
+                ║ client_id = %s ║ dataset_id = %s ║
+                ║ logger_key : %s
+                ║ endpoint : %s
+                ║ user     : %s
+                ║ time     : %s
+                ╚═══════════════════════════════════════════╝
+                """</span>, client_id, dataset_id, logger_key,
+                request.build_absolute_uri(), request.user,
+                datetime.now().isoformat()
+            )
+
+            <span class="comment"># Business logic with checkpoints</span>
+            data = self.process_data(logger_key)
+            
+            <span class="keyword">return</span> JsonResponse(data, safe=<span class="keyword">False</span>)
+
+        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:
+            multi_object_reporting_logger.exception(
+                <span class="string">f"[{logger_key}-ERROR]: ❌ {e}"</span>
+            )
+            <span class="keyword">return</span> JsonResponse({<span class="string">"Error"</span>: str(e)}, status=<span class="number">400</span>)
+
+        <span class="keyword">finally</span>:
+            multi_object_reporting_logger.info(<span class="string">f"[{logger_key}_done]"</span>)
+
+    <span class="keyword">def</span> <span class="function">process_data</span>(self, logger_key):
+        start = time.time()
+        
+        <span class="comment"># Log processing steps</span>
+        multi_object_reporting_logger.info(
+            <span class="string">f"[{logger_key}:processing] Starting data processing"</span>
+        )
+        
+        <span class="comment"># ... processing logic ...</span>
+        
+        multi_object_reporting_logger.info(
+            <span class="string">f"[{logger_key}:processing] Completed in {time.time()-start:.3f}s"</span>
+        )
+        
+        <span class="keyword">return</span> result</code></pre>
+
+            <h3>6.2 Sample Log Output</h3>
+            <p>What the logs look like in the file:</p>
+
+            <div class="box">
+                <pre style="background: white; color: #333; padding: 10px; font-size: 0.9em;"><code>[2026-01-29 10:15:32] INFO [multi_object_reporting_view ...] <span class="badge badge-info">[log-f138462418256848_start]</span>
+[2026-01-29 10:15:32] INFO [multi_object_reporting_view ...] ╔═══════════════╗
+                                                                 ║ client_id = 5 ║
+                                                                 ║ dataset_id = 15 ║
+                                                                 ╚═══════════════╝
+[2026-01-29 10:15:32] INFO [multi_object_reporting_view ...] <span class="badge badge-info">[log-f138462418256848:dataset_config]</span> data={...}
+[2026-01-29 10:15:33] INFO [multi_object_reporting_view ...] <span class="badge badge-info">[log-f138462418256848:opensearch_query]</span> query={...}
+[2026-01-29 10:15:34] INFO [multi_object_reporting_view ...] <span class="badge badge-info">[log-f138462418256848:opensearch_response]</span> response={...}
+[2026-01-29 10:15:35] WARNING [multi_object_reporting_view ...] <span class="badge badge-warning">[log-f138462418256848-WARNING]</span> ⚠️ Missing field
+[2026-01-29 10:15:36] INFO [multi_object_reporting_view ...] <span class="badge badge-info">[log-f138462418256848:first_level_formatting]</span> data={...}
+[2026-01-29 10:15:37] INFO [multi_object_reporting_view ...] <span class="badge badge-info">[log-f138462418256848_done]</span></code></pre>
+            </div>
+        </section>
+
+        <section id="troubleshooting">
+            <h2>7. Troubleshooting Guide</h2>
+
+            <h3>7.1 Common Issues</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Issue</th>
+                        <th>Cause</th>
+                        <th>Solution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Logger key not found</strong></td>
+                        <td>Request may have failed before logging started</td>
+                        <td>Check application error logs; add logging earlier in request lifecycle</td>
+                    </tr>
+                    <tr>
+                        <td><strong>No _done marker</strong></td>
+                        <td>Request may have crashed or is still running</td>
+                        <td>Check for exceptions; verify finally block is used</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Duplicate log entries</strong></td>
+                        <td>Logger propagate=True or multiple handlers</td>
+                        <td>Ensure <code>logger.propagate = False</code> in get_logger()</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Colors not showing in AWK</strong></td>
+                        <td>Terminal doesn't support ANSI colors</td>
+                        <td>Use <code>less -R</code> or redirect to file</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Log file growing too large</strong></td>
+                        <td>Rotation not working or too many logs</td>
+                        <td>Check TimedRotatingFileHandler config; reduce log level</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>7.2 Log File Management</h3>
+            <p>Monitor and manage log files:</p>
+
+            <div class="command">
+<span class="shell-prompt"># Check log file size</span>
+<span class="shell-prompt">$</span> du -h logs/custom/*.log
+
+<span class="shell-prompt"># View recent errors</span>
+<span class="shell-prompt">$</span> grep "ERROR" logs/custom/multi_object_reporting_view.log | tail -20
+
+<span class="shell-prompt"># Count requests by date</span>
+<span class="shell-prompt">$</span> grep "_start" logs/custom/multi_object_reporting_view.log | \
+  cut -d'[' -f2 | cut -d' ' -f1 | sort | uniq -c
+
+<span class="shell-prompt"># Find slow requests (>5 seconds)</span>
+<span class="shell-prompt">$</span> grep "Time took" logs/custom/multi_object_reporting_view.log | \
+  awk '$NF > 5.0' 
+
+<span class="shell-prompt"># Clean old backup logs (older than 30 days)</span>
+<span class="shell-prompt">$</span> find logs/custom -name "*.log.*" -mtime +30 -delete
+            </div>
+
+        <section>
+            <h2>Summary</h2>
+
+            <p>This logger system provides comprehensive request tracing capabilities through:</p>
+
+            <ul>
+                <li><span class="badge badge-success">✓</span> Unique logger keys for request isolation</li>
+                <li><span class="badge badge-success">✓</span> Structured markers for lifecycle tracking</li>
+                <li><span class="badge badge-success">✓</span> Automatic log rotation and retention</li>
+                <li><span class="badge badge-success">✓</span> Color-coded extraction for visual debugging</li>
+                <li><span class="badge badge-success">✓</span> Performance timing and error tracking</li>
+            </ul>
+
+            <p>
+                By following the patterns and best practices outlined in this document, you can maintain clean, 
+                traceable logs that significantly improve debugging efficiency and system observability.
+            </p>
+
+            <div class="success" style="margin-top: 30px;">
+                <strong>🎯 Key Takeaways:</strong>
+                <ul style="margin-top: 10px; margin-bottom: 0;">
+                    <li>Always use the <code>try-except-finally</code> pattern with logger keys</li>
+                    <li>Include <code>_start</code> and <code>_done</code> markers for every request</li>
+                    <li>Use descriptive section markers for different processing stages</li>
+                    <li>Use <code>.exception()</code> instead of <code>.error()</code> for better debugging</li>
+                    <li>Create reusable AWK scripts for efficient log extraction</li>
+                </ul>
+            </div>
+        </section>
+
+        <footer>
+            <p>For questions or contributions to this documentation, please contact your development team.</p>
+            <p>Last updated: January 2026</p>
+        </footer>
+    </div>
+</body>
+</html>
